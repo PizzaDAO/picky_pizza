@@ -179,17 +179,15 @@ body {
     border: none;
 }
 
-.topping[data-topping="sauce"],
+/* Styles for sauce when placed on pizza */
 .topping-placed[data-topping="sauce"] {
     width: 280px;
     height: 280px;
     transform: translate(-140px, -140px);
 }
 
-.topping[data-topping="sauce"] {
-    transform: none;
-    width: 50px;
-    height: 50px;
+.topping-placed[data-topping="sauce"]:hover {
+    transform: translate(-140px, -140px) scale(1.1);
 }
 
 .controls {
@@ -339,16 +337,14 @@ button {
         max-height: 150px;
     }
 
-    .topping[data-topping="sauce"],
     .topping-placed[data-topping="sauce"] {
         width: 230px;
         height: 230px;
         transform: translate(-115px, -115px);
     }
 
-    .topping[data-topping="sauce"] {
-        width: 45px;
-        height: 45px;
+    .topping-placed[data-topping="sauce"]:hover {
+        transform: translate(-115px, -115px) scale(1.1);
     }
 }
 
@@ -382,15 +378,13 @@ button {
         font-size: 1.5rem;
     }
 
-    .topping[data-topping="sauce"],
     .topping-placed[data-topping="sauce"] {
         width: 180px;
         height: 180px;
         transform: translate(-90px, -90px);
     }
 
-    .topping[data-topping="sauce"] {
-        width: 40px;
-        height: 40px;
+    .topping-placed[data-topping="sauce"]:hover {
+        transform: translate(-90px, -90px) scale(1.1);
     }
 } 
