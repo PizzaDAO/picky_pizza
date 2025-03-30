@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Picky Pizza</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>Picky Pizza</h1>
+            <div class="game-info">
+                <span>Attempts: <span id="attempts">0</span></span>
+                <span>Score: <span id="score">0</span></span>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="pizza-container">
+                <div class="pizza" id="pizza">
+                    <div class="pizza-base"></div>
+                </div>
+            </div>
+
+            <div class="toppings-container">
+                <h3>Available Toppings:</h3>
+                <div class="toppings-grid" id="toppings-grid"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="submit-btn">Submit Pizza</button>
+            <button id="clear-btn">Clear Pizza</button>
+        </div>
+
+        <div class="feedback-container">
+            <h3>Customer Feedback:</h3>
+            <div id="feedback" class="feedback"></div>
+        </div>
+
+        <div class="history-container">
+            <h3>Previous Attempts:</h3>
+            <div id="history" class="history"></div>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html> 
