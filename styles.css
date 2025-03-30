@@ -259,20 +259,6 @@ button {
     border-bottom: none;
 }
 
-.history-pizza {
-    margin: 0.5rem 0;
-    display: flex;
-    justify-content: center;
-}
-
-.history-pizza img {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
 .feedback.positive {
     color: #27ae60;
 }
@@ -353,11 +339,6 @@ button {
     .history {
         max-height: 150px;
     }
-
-    .history-pizza img {
-        width: 80px;
-        height: 80px;
-    }
 }
 
 @media screen and (max-width: 480px) {
@@ -388,10 +369,5 @@ button {
 
     .header h1 {
         font-size: 1.5rem;
-    }
-
-    .history-pizza img {
-        width: 60px;
-        height: 60px;
     }
 } 
