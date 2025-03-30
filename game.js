@@ -82,9 +82,10 @@ class PizzaDetective {
         
         const pizza = document.getElementById('pizza');
         const pizzaSize = pizza.offsetWidth;
-        const toppingSize = 50; // Updated to match new CSS size
+        const toppingSize = toppingName === 'sauce' ? 250 : 50; // Larger size for sauce
         const pizzaRadius = pizzaSize / 2;
         const toppingRadius = toppingSize / 2;
+        const padding = toppingName === 'sauce' ? 10 : 20; // Less padding for sauce
         
         // Function to check if a point is within the pizza circle
         const isWithinPizza = (x, y) => {
@@ -94,7 +95,7 @@ class PizzaDetective {
                 Math.pow(x - centerX, 2) + 
                 Math.pow(y - centerY, 2)
             );
-            return distance <= pizzaRadius - toppingRadius;
+            return distance <= pizzaRadius - toppingRadius - padding;
         };
         
         // Function to generate a valid position
