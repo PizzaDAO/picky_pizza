@@ -181,15 +181,15 @@ body {
 
 .topping[data-topping="sauce"],
 .topping-placed[data-topping="sauce"] {
-    width: 250px;
-    height: 250px;
-    transform: translate(-125px, -125px);
+    width: 280px;
+    height: 280px;
+    transform: translate(-140px, -140px);
 }
 
 .topping[data-topping="sauce"] {
     transform: none;
-    width: 100px;
-    height: 100px;
+    width: 50px;
+    height: 50px;
 }
 
 .controls {
@@ -341,14 +341,14 @@ button {
 
     .topping[data-topping="sauce"],
     .topping-placed[data-topping="sauce"] {
-        width: 200px;
-        height: 200px;
-        transform: translate(-100px, -100px);
+        width: 230px;
+        height: 230px;
+        transform: translate(-115px, -115px);
     }
 
     .topping[data-topping="sauce"] {
-        width: 80px;
-        height: 80px;
+        width: 45px;
+        height: 45px;
     }
 }
 
@@ -384,13 +384,13 @@ button {
 
     .topping[data-topping="sauce"],
     .topping-placed[data-topping="sauce"] {
-        width: 150px;
-        height: 150px;
-        transform: translate(-75px, -75px);
+        width: 180px;
+        height: 180px;
+        transform: translate(-90px, -90px);
     }
 
     .topping[data-topping="sauce"] {
-        width: 60px;
-        height: 60px;
+        width: 40px;
+        height: 40px;
     }
 } 
