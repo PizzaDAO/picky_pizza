@@ -10,7 +10,8 @@ class PizzaDetective {
             { name: 'onions', image: 'images/onions.png' },
             { name: 'cheese', image: 'images/cheese.png' },
             { name: 'sausage', image: 'images/sausage.png' },
-            { name: 'bacon', image: 'images/bacon.png' }
+            { name: 'bacon', image: 'images/bacon.png' },
+            { name: 'sauce', image: 'images/sauce.png' }
         ];
         this.placedToppings = [];
         this.targetToppings = [];
@@ -46,8 +47,7 @@ class PizzaDetective {
             availableToppings.splice(randomIndex, 1);
         }
 
-        // Reset puzzle attempts and update UI
-        this.puzzleAttempts = 0;
+        // Update UI
         this.updateUI();
     }
 
@@ -82,7 +82,7 @@ class PizzaDetective {
         
         const pizza = document.getElementById('pizza');
         const pizzaSize = pizza.offsetWidth;
-        const toppingSize = 60; // Updated to match new CSS size
+        const toppingSize = 50; // Updated to match new CSS size
         const pizzaRadius = pizzaSize / 2;
         const toppingRadius = toppingSize / 2;
         
@@ -162,14 +162,14 @@ class PizzaDetective {
         this.placedToppings = [];
     }
 
-    checkSolution() {
+    async checkSolution() {
         // Don't count empty pizzas as attempts
         if (this.placedToppings.length === 0) {
             this.showMessage('Please add some toppings to the pizza first!', 'error');
             return;
         }
 
-        // Increment attempts first
+        // Increment attempts
         this.puzzleAttempts++;
         this.attempts++;
         
@@ -193,23 +193,33 @@ class PizzaDetective {
             feedback = `Perfect! This is exactly what I wanted! (Solved in ${this.puzzleAttempts} attempts)`;
             isCorrect = true;
             this.score += 100;
+            
+            // Add to history before resetting attempts
+            this.history.unshift({
+                toppings: [...placedToppingNames],
+                feedback: feedback,
+                isCorrect: isCorrect,
+                attempt: this.puzzleAttempts
+            });
+            
+            // Reset attempts after adding to history
+            this.puzzleAttempts = 0;
             this.generateTargetToppings();
         } else {
             if (extraToppings.length > 0) {
-                feedback = `There's something on this pizza I don't like. `;
+                feedback = `There's something on this pizza I don't like!`;
+            } else if (missingToppings.length > 0) {
+                feedback = `I'd like more toppings.`;
             }
-            if (missingToppings.length > 0) {
-                feedback += `I'd like more toppings.`;
-            }
+            
+            // Add to history for incorrect attempts
+            this.history.unshift({
+                toppings: [...placedToppingNames],
+                feedback: feedback,
+                isCorrect: isCorrect,
+                attempt: this.puzzleAttempts
+            });
         }
-        
-        // Add to history
-        this.history.unshift({
-            toppings: [...placedToppingNames],
-            feedback: feedback,
-            isCorrect: isCorrect,
-            attempt: this.puzzleAttempts
-        });
         
         // Update UI with new attempt count
         this.updateUI();
@@ -263,7 +273,7 @@ class PizzaDetective {
             return `
                 <div class="history-item">
                     <strong>Attempt ${item.attempt}:</strong> ${this.formatHistoryToppingsList(uniqueToppings)}<br>
-                    <span class="${item.isCorrect ? 'positive' : 'negative'}">${item.feedback}</span>
+                    <strong>Customer:</strong> <span class="${item.isCorrect ? 'positive' : 'negative'}">${item.feedback}</span>
                 </div>
             `;
         }).join('');

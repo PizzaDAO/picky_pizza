@@ -92,8 +92,10 @@ body {
 
 .toppings-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    max-width: 300px;
+    margin: 0 auto;
 }
 
 .topping-item {
@@ -104,8 +106,8 @@ body {
 }
 
 .topping {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     cursor: pointer;
     transition: transform 0.2s;
@@ -143,8 +145,8 @@ body {
 
 .topping-placed {
     position: absolute;
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     transform: translate(-50%, -50%);
     cursor: pointer;
     transition: transform 0.2s;
@@ -177,6 +179,7 @@ body {
 .topping[data-topping="cheese"],
 .topping[data-topping="sausage"],
 .topping[data-topping="bacon"],
+.topping[data-topping="sauce"],
 .topping-placed[data-topping="pepperoni"],
 .topping-placed[data-topping="mushrooms"],
 .topping-placed[data-topping="olives"],
@@ -184,7 +187,8 @@ body {
 .topping-placed[data-topping="onions"],
 .topping-placed[data-topping="cheese"],
 .topping-placed[data-topping="sausage"],
-.topping-placed[data-topping="bacon"] {
+.topping-placed[data-topping="bacon"],
+.topping-placed[data-topping="sauce"] {
     background: none;
     border: none;
 }
@@ -255,10 +259,139 @@ button {
     border-bottom: none;
 }
 
+.history-pizza {
+    margin: 0.5rem 0;
+    display: flex;
+    justify-content: center;
+}
+
+.history-pizza img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 .feedback.positive {
     color: #27ae60;
 }
 
 .feedback.negative {
     color: #c0392b;
+}
+
+@media screen and (max-width: 768px) {
+    body {
+        padding: 1rem;
+    }
+
+    .game-container {
+        padding: 1rem;
+        width: 100%;
+    }
+
+    .game-area {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .pizza {
+        width: 250px;
+        height: 250px;
+    }
+
+    .toppings-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.8rem;
+        max-width: 250px;
+    }
+
+    .topping {
+        width: 45px;
+        height: 45px;
+    }
+
+    .topping-placed {
+        width: 45px;
+        height: 45px;
+    }
+
+    .topping-label {
+        font-size: 0.75rem;
+    }
+
+    .controls {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    button {
+        width: 100%;
+        padding: 1rem;
+        font-size: 1.1rem;
+    }
+
+    .game-info {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .header h1 {
+        font-size: 1.8rem;
+    }
+
+    .feedback-container h3, 
+    .history-container h3 {
+        font-size: 1.2rem;
+    }
+
+    .feedback {
+        font-size: 1rem;
+    }
+
+    .history {
+        max-height: 150px;
+    }
+
+    .history-pizza img {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .toppings-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.6rem;
+        max-width: 200px;
+    }
+
+    .pizza {
+        width: 200px;
+        height: 200px;
+    }
+
+    .topping {
+        width: 40px;
+        height: 40px;
+    }
+
+    .topping-placed {
+        width: 40px;
+        height: 40px;
+    }
+
+    .topping-label {
+        font-size: 0.7rem;
+    }
+
+    .header h1 {
+        font-size: 1.5rem;
+    }
+
+    .history-pizza img {
+        width: 60px;
+        height: 60px;
+    }
 } 
