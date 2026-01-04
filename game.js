@@ -2,6 +2,9 @@ class PizzaDetective {
     constructor() {
         this.attempts = 0;
         this.score = 0;
+        // ✅ Puzzle rule: every guess (and every target) is exactly 3 toppings.
+        // This turns the game into a Mastermind-style deduction puzzle.
+        this.REQUIRED_TOPPINGS_PER_GUESS = 3;
         this.toppings = [
             { name: 'pepperoni', image: 'images/pepperoni.png' },
             { name: 'mushrooms', image: 'images/mushrooms.png' },
@@ -17,8 +20,29 @@ class PizzaDetective {
         this.targetToppings = [];
         this.history = [];
         this.puzzleAttempts = 0; // Track attempts per puzzle
+        // When a puzzle is solved, keep the solved pizza + feedback on screen
+        // until the player starts the next puzzle (by clicking a topping or Clear).
+        this.pendingNewPuzzle = false;
         
+        // Track whether the current pizza has been submitted; if so, keep it visible until the next topping or Clear.
+        this.hasSubmitted = false;
+
         this.initializeGame();
+    }
+
+    clearFeedback() {
+        const feedbackElement = document.getElementById('feedback');
+        feedbackElement.textContent = '';
+        feedbackElement.className = 'feedback';
+    }
+
+    startNextPuzzle() {
+        this.clearPizza();
+        this.clearFeedback();
+        this.pendingNewPuzzle = false;
+        this.hasSubmitted = false;
+        this.generateTargetToppings();
+        this.updateUI();
     }
 
     initializeGame() {
@@ -29,13 +53,26 @@ class PizzaDetective {
 
     setupEventListeners() {
         document.getElementById('submit-btn').addEventListener('click', () => this.checkSolution());
-        document.getElementById('clear-btn').addEventListener('click', () => this.clearPizza());
+        document.getElementById('clear-btn').addEventListener('click', () => this.handleClearClick());
         document.getElementById('pizza').addEventListener('click', (e) => this.handlePizzaClick(e));
     }
 
+    handleClearClick() {
+        // Clear should also clear the feedback line.
+        // If the previous puzzle was solved, Clear starts the next puzzle.
+        if (this.pendingNewPuzzle) {
+            this.startNextPuzzle();
+            return;
+        }
+
+        this.clearPizza();
+        this.clearFeedback();
+        this.hasSubmitted = false;
+    }
+
     generateTargetToppings() {
-        // Generate a random number of toppings (3-5)
-        const numToppings = Math.floor(Math.random() * 3) + 3;
+        // ✅ Target is exactly 3 toppings (matches REQUIRED_TOPPINGS_PER_GUESS)
+        const numToppings = this.REQUIRED_TOPPINGS_PER_GUESS;
         
         // Randomly select toppings
         const availableToppings = [...this.toppings];
@@ -74,11 +111,37 @@ class PizzaDetective {
     }
 
     handleToppingClick(toppingElement) {
+        // If the previous puzzle was solved, any new interaction starts the next puzzle.
+        if (this.pendingNewPuzzle) this.startNextPuzzle();
+
+        // After submitting, keep the pizza + feedback visible until the player starts a new guess
+        // by clicking a topping (any topping) or Clear.
+        if (this.hasSubmitted) {
+            this.clearPizza();
+            this.clearFeedback();
+            this.hasSubmitted = false;
+        } else {
+            // Clear any non-submission feedback (e.g. 'only 3 topping types') on interaction.
+            this.clearFeedback();
+        }
+
         const toppingName = toppingElement.dataset.topping;
         const topping = this.toppings.find(t => t.name === toppingName);
-        
-        // Generate 3-5 toppings in random positions
-        const numToppings = Math.floor(Math.random() * 3) + 3; // Random number between 3-5
+
+        // ✅ Only allow up to 3 different topping *types* on the pizza at once.
+        // Re-clicking an already-used topping is always allowed (and still sprays 3–5 copies).
+        const existingTypes = new Set(this.placedToppings.map(t => t.name));
+        if (!existingTypes.has(toppingName) && existingTypes.size >= this.REQUIRED_TOPPINGS_PER_GUESS) {
+            this.showMessage(`You can only use ${this.REQUIRED_TOPPINGS_PER_GUESS} topping types per pizza.`, 'error');
+            return;
+        }
+
+        // ✅ Keep the fun "spray" behavior: clicking a topping drops multiple copies.
+        // The deduction rules are enforced at submit time (exactly 3 *unique* topping types),
+        // so players are free to click toppings multiple times and stack visuals.
+        const copies = toppingName === 'sauce'
+            ? 1
+            : (3 + Math.floor(Math.random() * 3)); // 3–5 copies
         
         const pizza = document.getElementById('pizza');
         const pizzaSize = pizza.offsetWidth;
@@ -108,32 +171,32 @@ class PizzaDetective {
             return { x, y };
         };
         
-        for (let i = 0; i < numToppings; i++) {
+        for (let i = 0; i < copies; i++) {
             // Create a new topping element
             const newTopping = document.createElement('div');
             newTopping.className = 'topping-placed';
             newTopping.dataset.topping = toppingName;
-            
+
             // Create and add the image
             const img = document.createElement('img');
             img.src = topping.image;
             img.alt = toppingName;
             newTopping.appendChild(img);
-            
+
             // Add to pizza
             pizza.appendChild(newTopping);
-            
+
             // Generate valid position within the pizza circle
             const { x, y } = generateValidPosition();
-            
+
             // Generate random rotation
             const rotation = Math.random() * 360;
             newTopping.style.setProperty('--rotation', `${rotation}deg`);
-            
+
             // Set position
             newTopping.style.left = `${x}px`;
             newTopping.style.top = `${y}px`;
-            
+
             // Store topping position
             this.placedToppings.push({
                 name: toppingName,
@@ -163,63 +226,79 @@ class PizzaDetective {
         this.placedToppings = [];
     }
 
+    handleClearClick() {
+        // Clearing should also dismiss the feedback line.
+        // If a puzzle was just solved, Clear advances to the next puzzle.
+        if (this.pendingNewPuzzle) {
+            this.startNextPuzzle();
+            return;
+        }
+        this.clearPizza();
+        this.clearFeedback();
+    }
+
     async checkSolution() {
-        // Don't count empty pizzas as attempts
-        if (this.placedToppings.length === 0) {
-            this.showMessage('Please add some toppings to the pizza first!', 'error');
+        // If the last puzzle was solved, don't allow submitting again; start the next puzzle instead.
+        if (this.pendingNewPuzzle) {
+            this.showMessage('Pick a topping (or Clear) to start the next pizza!', 'error');
+            return;
+        }
+
+        // Mark that this pizza was submitted so it stays on screen until the next topping or Clear.
+        this.hasSubmitted = true;
+
+        // Mark that this pizza was submitted so it stays on screen until the next topping or Clear.
+        this.hasSubmitted = true;
+
+        // Enforce EXACTLY 3 unique topping *types* per submission and don't count invalid pizzas as attempts
+        const placedToppingNames = this.placedToppings.map(t => t.name);
+        const uniquePlacedToppingNames = [...new Set(placedToppingNames)];
+        if (uniquePlacedToppingNames.length !== this.REQUIRED_TOPPINGS_PER_GUESS) {
+            if (uniquePlacedToppingNames.length === 0) {
+                this.showMessage('Please add toppings to the pizza first!', 'error');
+            } else {
+                this.showMessage(`Please submit a pizza with exactly ${this.REQUIRED_TOPPINGS_PER_GUESS} topping types.`, 'error');
+            }
             return;
         }
 
         // Increment attempts
         this.puzzleAttempts++;
         this.attempts++;
-        
-        // Get the names of placed toppings
-        const placedToppingNames = this.placedToppings.map(t => t.name);
-        
-        // Check for extra toppings
-        const extraToppings = placedToppingNames.filter(
-            topping => !this.targetToppings.some(t => t.name === topping)
-        );
-        
-        // Check for missing toppings
-        const missingToppings = this.targetToppings.filter(
-            topping => !placedToppingNames.includes(topping.name)
-        );
-        
+
+        // Count how many of the 3 guessed toppings are correct
+        const correctCount = uniquePlacedToppingNames.filter(
+            topping => this.targetToppings.some(t => t.name === topping)
+        ).length;
+
         let feedback = '';
         let isCorrect = false;
-        
-        if (extraToppings.length === 0 && missingToppings.length === 0) {
-            feedback = `Perfect! This is exactly what I wanted! (Solved in ${this.puzzleAttempts} attempts)`;
+
+        if (correctCount === 0) {
+            feedback = 'None of these toppings are correct.';
+        } else if (correctCount === 1) {
+            feedback = 'Exactly 1 of these toppings is correct.';
+        } else if (correctCount === 2) {
+            feedback = 'Exactly 2 of these toppings are correct.';
+        } else {
+            // correctCount === 3
+            feedback = `Perfect! All 3 toppings are correct! (Solved in ${this.puzzleAttempts} attempts)`;
             isCorrect = true;
             this.score += 100;
-            
-            // Add to history before resetting attempts
-            this.history.unshift({
-                toppings: [...placedToppingNames],
-                feedback: feedback,
-                isCorrect: isCorrect,
-                attempt: this.puzzleAttempts
-            });
-            
-            // Reset attempts after adding to history
+        }
+
+        // Add to history (store the 3 unique toppings, not visual duplicates)
+        this.history.unshift({
+            toppings: [...uniquePlacedToppingNames],
+            feedback: feedback,
+            isCorrect: isCorrect,
+            attempt: this.puzzleAttempts
+        });
+
+        if (isCorrect) {
+            // Reset attempts after adding to history, but keep the solved pizza visible.
             this.puzzleAttempts = 0;
-            this.generateTargetToppings();
-        } else {
-            if (extraToppings.length > 0) {
-                feedback = `There's something on this pizza I don't like!`;
-            } else if (missingToppings.length > 0) {
-                feedback = `I'd like more toppings.`;
-            }
-            
-            // Add to history for incorrect attempts
-            this.history.unshift({
-                toppings: [...placedToppingNames],
-                feedback: feedback,
-                isCorrect: isCorrect,
-                attempt: this.puzzleAttempts
-            });
+            this.pendingNewPuzzle = true;
         }
         
         // Update UI with new attempt count
@@ -228,7 +307,8 @@ class PizzaDetective {
         // Update UI
         this.updateFeedback(feedback, isCorrect);
         this.updateHistory();
-        this.clearPizza();
+        // ✅ Keep toppings on the pizza after submission.
+        // The feedback line stays until the player clicks a topping or clicks Clear.
     }
 
     formatToppingsList(toppings) {
